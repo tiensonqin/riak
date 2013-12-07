@@ -5,7 +5,8 @@ BASE_DIR         = $(shell pwd)
 ERLANG_BIN       = $(shell dirname $(shell which erl))
 REBAR           ?= $(BASE_DIR)/rebar
 OVERLAY_VARS    ?=
-
+BUILD_JMX       := $(shell if [ -d deps/riak_jmx ]; then echo "1"; else echo "0"; fi)
+$(warning "$(BUILD_JMX)")
 $(if $(ERLANG_BIN),,$(warning "Warning: No Erlang found in your path, this will probably not work"))
 
 .PHONY: rel stagedevrel deps
@@ -14,12 +15,18 @@ all: deps compile
 
 compile:
 	./rebar compile
+ifneq ($(BUILD_JMX),1)
+	$(MAKE) -C deps/riak_jmx/java_src
+endif
 
 deps:
 	./rebar get-deps
 
 clean: testclean
 	./rebar clean
+ifeq ($(BUILD_JMX),1)
+	$(MAKE) -C deps/riak_jmx/java_src clean
+endif
 
 distclean: clean devclean relclean ballclean
 	./rebar delete-deps
@@ -284,6 +291,14 @@ pkgclean: ballclean
 ##
 ## Packaging targets
 ##
+
+## Do not export RIAK_EE_DEPS unless it is set, since even an empty
+## variable will affect the build and 'export' by default makes it empty
+## if it is unset
+BUILD_EE = $(shell test -n "$${RIAK_EE_DEPS+x}" && echo "true" || echo "false")
+ifeq ($(BUILD_EE),true)
+export RIAK_EE_DEPS=true
+endif
 
 # Yes another variable, this one is repo-<generatedhash
 # which differs from $REVISION that is repo-<commitcount>-<commitsha>
