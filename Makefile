@@ -15,7 +15,7 @@ all: deps compile
 
 compile:
 	./rebar compile
-ifneq ($(BUILD_JMX),1)
+ifeq ($(BUILD_JMX),1)
 	$(MAKE) -C deps/riak_jmx/java_src
 endif
 
