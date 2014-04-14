@@ -6,7 +6,7 @@
 . "{{runner_base_dir}}/lib/env.sh"
 
 # Make sure the user running this script is the owner and/or su to that user
-check_user $@
+check_user "$@"
 ES=$?
 if [ "$ES" -ne 0 ]; then
     exit $ES
@@ -28,7 +28,8 @@ usage() {
     echo "                    cluster-info | member-status | ring-status | vnode-status |"
     echo "                    aae-status | diag | status | transfer-limit | reformat-indexes |"
     echo "                    top [-interval N] [-sort reductions|memory|msg_q] [-lines N] |"
-    echo "                    downgrade-objects | security | bucket-type | repair-2i }"
+    echo "                    downgrade-objects | security | bucket-type | repair-2i |"
+    echo "                    search }"
 }
 
 cluster_admin()
@@ -140,6 +141,20 @@ security_admin()
                 exit 1
             fi
             $NODETOOL rpc riak_core_console add_user "$@"
+            if [ $? -eq 0 ]; then
+                $NODETOOL rpc riak_core_console print_user "$1"
+            fi
+            ;;
+        add-group)
+            shift
+            if [ $# -lt 1 ]; then
+                echo "Usage: $SCRIPT security add-group <group> [<option>=<value> [...]]"
+                exit 1
+            fi
+            $NODETOOL rpc riak_core_console add_group "$@"
+            if [ $? -eq 0 ]; then
+                $NODETOOL rpc riak_core_console print_group "$1"
+            fi
             ;;
         alter-user)
             shift
@@ -148,14 +163,36 @@ security_admin()
                 exit 1
             fi
             $NODETOOL rpc riak_core_console alter_user "$@"
+            if [ $? -eq 0 ]; then
+                $NODETOOL rpc riak_core_console print_user "$1"
+            fi
+            ;;
+        alter-group)
+            shift
+            if [ $# -lt 2 ]; then
+                echo "Usage: $SCRIPT security alter-group <group> <option> [<option>=<value> [...]]"
+                exit 1
+            fi
+            $NODETOOL rpc riak_core_console alter_group "$@"
+            if [ $? -eq 0 ]; then
+                $NODETOOL rpc riak_core_console print_group "$1"
+            fi
             ;;
         del-user)
             shift
             if [ $# -ne 1 ]; then
-                echo "Usage: $SCRIPT security alter-user <user>"
+                echo "Usage: $SCRIPT security del-user <user>"
                 exit 1
             fi
             $NODETOOL rpc riak_core_console del_user "$@"
+            ;;
+        del-group)
+            shift
+            if [ $# -ne 1 ]; then
+                echo "Usage: $SCRIPT security del-group <user>"
+                exit 1
+            fi
+            $NODETOOL rpc riak_core_console del_group "$@"
             ;;
         add-source)
             shift
@@ -176,7 +213,7 @@ security_admin()
         grant)
             shift
             if [ $# -lt 5 ]; then
-                echo "Usage: $SCRIPT security grant <permissions> ON ANY|<type> [bucket] TO <users>"
+                echo "Usage: $SCRIPT security grant <permissions> on any|<type> [bucket] to <users>"
                 exit 1
             fi
             $NODETOOL rpc riak_core_console grant "$@"
@@ -184,7 +221,7 @@ security_admin()
         revoke)
             shift
             if [ $# -lt 5 ]; then
-                echo "Usage: $SCRIPT security revoke <permissions> ON ANY|<type> [bucket] FROM <users>"
+                echo "Usage: $SCRIPT security revoke <permissions> on any|<type> [bucket] from <users>"
                 exit 1
             fi
             $NODETOOL rpc riak_core_console revoke "$@"
@@ -192,25 +229,46 @@ security_admin()
         print-users)
             $NODETOOL rpc riak_core_console print_users
             ;;
+        print-groups)
+            $NODETOOL rpc riak_core_console print_groups
+            ;;
         print-sources)
             $NODETOOL rpc riak_core_console print_sources
             ;;
         enable)
             $NODETOOL rpc riak_core_console security_enable
+            $NODETOOL rpc riak_core_console security_status
             ;;
         disable)
             $NODETOOL rpc riak_core_console security_disable
+            $NODETOOL rpc riak_core_console security_status
             ;;
         status)
             $NODETOOL rpc riak_core_console security_status
             ;;
+        print-grants)
+            shift
+            if [ $# -ne 1 ]; then
+                echo "Usage: $SCRIPT security print-grants <user>"
+                exit 1
+            fi
+            $NODETOOL rpc riak_core_console print_grants "$@"
+            ;;
         print-user)
             shift
-            if [ $# -lt 1 ]; then
+            if [ $# -ne 1 ]; then
                 echo "Usage: $SCRIPT security print-user <user>"
                 exit 1
             fi
             $NODETOOL rpc riak_core_console print_user "$@"
+            ;;
+        print-group)
+            shift
+            if [ $# -ne 1 ]; then
+                echo "Usage: $SCRIPT security print-group <group>"
+                exit 1
+            fi
+            $NODETOOL rpc riak_core_console print_group "$@"
             ;;
         ciphers)
             shift
@@ -223,19 +281,51 @@ Usage: $SCRIPT security <command>
 The following commands modify users and security ACLs for Riak:
 
     add-user <username> [<option>=<value> [...]]
+    add-group <groupname> [<option>=<value> [...]]
     alter-user <username> <option> [<option>=<value> [...]]
+    alter-group <groupname> <option> [<option>=<value> [...]]
     del-user <username>
+    del-group <groupname>
     add-source all|<users> <CIDR> <source> [<option>=<value> [...]]
     del-source all|<users> <CIDR>
-    grant <permissions> ON ANY|<type> [bucket] TO <users>
-    revoke <permissions> ON ANY|<type> [bucket] FROM <users>
+    grant <permissions> on any|<type> [bucket] to <users>
+    revoke <permissions> on any|<type> [bucket] from <users>
     print-users
-    print-sources
+    print-groups
     print-user <user>
+    print-group <group>
+    print-grants <user|group>
+    print-sources
     enable
     disable
     status
     ciphers [cipherlist]
+"
+    esac
+}
+
+search_admin()
+{
+    case "$1" in
+        aae[_-]status)
+            if [ $# -ne 1 ]; then
+                echo "Usage: $SCRIPT search $1"
+                exit 1
+            fi
+            shift
+
+            # Make sure the local node is running
+            node_up_check
+
+            $NODETOOL rpc yz_console aae_status "$@"
+            ;;
+        *)
+echo "\
+Usage: $SCRIPT search <command>
+
+Available commands:
+
+    aae-status
 "
     esac
 }
@@ -260,20 +350,46 @@ btype_admin()
             $NODETOOL rpc riak_kv_console bucket_type_activate "$2"
             ;;
         create)
-            if [ $# -ne 3 ]; then
-                echo "Usage: $SCRIPT bucket-type create <type> '{\"props\": { ... }}'"
+            if [ $# -lt 2 ]; then
+                echo "Usage: $SCRIPT bucket-type create <type> ['{\"props\": { ... }}']"
                 exit 1
             fi
             node_up_check
-            $NODETOOL rpc riak_kv_console bucket_type_create "$2" "$3"
+
+            # Allow for both command line styles (quoted 3rd param) or $@ parameters
+            #     bucket-type create <type> '{"props": { ... }}'"
+            #     bucket-type create <type> {"props": { ... }}"
+            #
+            if [ $# -le 3 ]; then
+                json=${3:-}
+                $NODETOOL rpc riak_kv_console bucket_type_create "$2" "$json"
+            else  # greater than 3 parameters
+                two=$2
+                shift 2
+                three=$@
+                $NODETOOL rpc riak_kv_console bucket_type_create "$two" "$three"
+            fi
+
             ;;
         update)
-            if [ $# -ne 3 ]; then
+            if [ $# -lt 3 ]; then
                 echo "Usage: $SCRIPT bucket-type update <type> '{\"props\": { ... }}'"
                 exit 1
             fi
             node_up_check
-            $NODETOOL rpc riak_kv_console bucket_type_update "$2" "$3"
+
+            # Allow for both command line styles (quoted 3rd param) or $@ parameters
+            #     bucket-type update <type> '{"props": { ... }}'"
+            #     bucket-type update <type> {"props": { ... }}"
+            #
+            if [ $# -eq 3 ]; then
+                $NODETOOL rpc riak_kv_console bucket_type_update "$2" "$3"
+            else  # greater than 3 parameters
+                two=$2
+                shift 2
+                three=$@
+                $NODETOOL rpc riak_kv_console bucket_type_update "$two" "$three"
+            fi
             ;;
         list)
             if [ $# -ne 1 ]; then
@@ -378,7 +494,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_kv_console down $@
+        $NODETOOL rpc riak_kv_console down "$@"
         ;;
 
     status)
@@ -391,7 +507,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_kv_console status $@
+        $NODETOOL rpc riak_kv_console status "$@"
         ;;
 
     vnode[_-]status)
@@ -404,7 +520,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_kv_console vnode_status $@
+        $NODETOOL rpc riak_kv_console vnode_status "$@"
         ;;
 
     ringready)
@@ -417,7 +533,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_kv_console ringready $@
+        $NODETOOL rpc riak_kv_console ringready "$@"
         ;;
 
     transfers)
@@ -430,7 +546,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_core_console transfers $@
+        $NODETOOL rpc riak_core_console transfers "$@"
         ;;
 
     member[_-]status)
@@ -443,7 +559,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_core_console member_status $@
+        $NODETOOL rpc riak_core_console member_status "$@"
         ;;
 
     ring[_-]status)
@@ -456,7 +572,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_core_console ring_status $@
+        $NODETOOL rpc riak_core_console ring_status "$@"
         ;;
 
     aae[_-]status)
@@ -469,7 +585,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_kv_console aae_status $@
+        $NODETOOL rpc riak_kv_console aae_status "$@"
         ;;
 
     repair[_-]2i)
@@ -478,7 +594,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_kv_console repair_2i $@
+        $NODETOOL rpc riak_kv_console repair_2i "$@"
         ;;
 
     cluster[_-]info)
@@ -491,7 +607,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc_infinity riak_kv_console cluster_info $@
+        $NODETOOL rpc_infinity riak_kv_console cluster_info "$@"
         ;;
 
     services)
@@ -541,7 +657,7 @@ case "$1" in
         # Make sure the local node is running
         node_up_check
 
-        $NODETOOL rpc riak_kv_js_manager reload $@
+        $NODETOOL rpc riak_kv_js_manager reload "$@"
         ;;
 
     erl[_-]reload)
@@ -715,6 +831,10 @@ case "$1" in
     security)
         shift
         security_admin "$@"
+        ;;
+    search)
+        shift
+        search_admin "$@"
         ;;
     *)
         usage
