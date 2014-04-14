@@ -43,15 +43,6 @@
                      "760928ec8870da02eb11bccb501e2700925d06c6"}},
        {cuttlefish,".*",
                    {git,"git://github.com/basho/cuttlefish.git",
-<<<<<<< HEAD
-                        "4b34fbe46258590833598877b617ef7f0508c960"}},
-       {bitcask,".*",
-                {git,"git://github.com/basho/bitcask.git",
-                     "5ff44fc6ea54605f24021989bc77195066744374"}},
-       {eper,".*",
-             {git,"git://github.com/basho/eper.git",
-                  "0e6d5b6dc7be9047ee7356e6e87d8716f8028db9"}},
-=======
                         "505400716dbc76ec9387d9d4335819b3bdcff9b2"}},
        {bitcask,".*",
                 {git,"git://github.com/basho/bitcask.git",
@@ -59,7 +50,6 @@
        {eper,".*",
              {git,"git://github.com/basho/eper.git",
                   "7222ecaebceb5422e74a9c1503043bbc6036f6b7"}},
->>>>>>> 1aa12b1de8618c2e6de936c86d87c49d297f5298
        {edown,".*",
               {git,"git://github.com/esl/edown.git",
                    "4cb4ad67382590d92228ea6c56225376bd9f5685"}},
@@ -74,11 +64,7 @@
                          "19c532af235ae675439d491b329c55c2f9b02deb"}},
        {riak_sysmon,".*",
                     {git,"git://github.com/basho/riak_sysmon.git",
-<<<<<<< HEAD
-                         "973fbef22760332a8866de64d6f7ad3654b38375"}},
-=======
                          "ee3bb982452f0ac224001c197e46ef7952effeb2"}},
->>>>>>> 1aa12b1de8618c2e6de936c86d87c49d297f5298
        {bear,".*",
              {git,"git://github.com/basho/bear.git",
                   "da820a13c607c3f816ee8b83c587266da5389761"}},
@@ -87,27 +73,16 @@
                     "e80bd013c8ea906c4f14cba38b92e95116415e23"}},
        {riak_ensemble,".*",
                       {git,"git://github.com/basho/riak_ensemble",
-<<<<<<< HEAD
-                           "45b664f16101ce6a5be963e7c27203725c4d9dd6"}},
-=======
                            "abab1bbb295876da1e7be20f2f92abf84012badd"}},
->>>>>>> 1aa12b1de8618c2e6de936c86d87c49d297f5298
        {pbkdf2,".*",
                {git,"git://github.com/basho/erlang-pbkdf2.git",
                     "7076584f5377e98600a7e2cb81980b2992fb2f71"}},
        {eleveldb,".*",
                  {git,"git://github.com/basho/eleveldb.git",
-<<<<<<< HEAD
-                      "fc3f09e5f960930e25649c150c194406a50e5a38"}},
-       {riak_core,".*",
-                  {git,"git://github.com/basho/riak_core.git",
-                       "8344324ba5701f6f222ae500c88ac07de432c48f"}},
-=======
                       "9ab8ed627dd0d8adcddded7d6cbc251a2531e70a"}},
        {riak_core,".*",
                   {git,"git://github.com/basho/riak_core.git",
                        "d080ef28a2add87430b2a621c24876c1b5903d78"}},
->>>>>>> 1aa12b1de8618c2e6de936c86d87c49d297f5298
        {riak_pipe,".*",
                   {git,"git://github.com/basho/riak_pipe.git",
                        "4ca91c6cb5c8e178248ff57a93d5447f934c1002"}},
@@ -116,11 +91,7 @@
                         "37f9b1c50abd867302b9ff5c3ca59ea157cdf3e5"}},
        {riak_pb,".*",
                 {git,"git://github.com/basho/riak_pb.git",
-<<<<<<< HEAD
-                     "2571713a8ea006540a0b10135ce3616b99d9b7a1"}},
-=======
                      "b3ba6899b66673b5584b4d42783319592c19b4ef"}},
->>>>>>> 1aa12b1de8618c2e6de936c86d87c49d297f5298
        {mochiweb,".*",
                  {git,"git://github.com/basho/mochiweb.git",
                       "5e6e3e688dc9987a97e261431256e29671555c0b"}},
@@ -132,15 +103,6 @@
                         "e5f82336bb7a4552dd33e02bf8f66e67547f13be"}},
        {riak_api,".*",
                  {git,"git://github.com/basho/riak_api.git",
-<<<<<<< HEAD
-                      "5149e8f2ecf03e39292e8d4fa4bbd70cae33d84f"}},
-       {riak_dt,".*",
-                {git,"git://github.com/basho/riak_dt.git",
-                     "8b78b300edb725fb71f367ae3032706599cf0369"}},
-       {riak_kv,".*",
-                {git,"git://github.com/basho/riak_kv.git",
-                     "2ea327b415a37afe9d23a3fd5e9d8a6deb3eb0af"}},
-=======
                       "bba2420da8dd7db77f5d649aaddc972fe5388f52"}},
        {riak_dt,".*",
                 {git,"git://github.com/basho/riak_dt.git",
@@ -148,7 +110,6 @@
        {riak_kv,".*",
                 {git,"git://github.com/basho/riak_kv.git",
                      "bb6502bab9eb4bd82a82053b2693417ec7b549ee"}},
->>>>>>> 1aa12b1de8618c2e6de936c86d87c49d297f5298
        {merge_index,".*",
                     {git,"git://github.com/basho/merge_index.git",
                          "b701dde5c28956c3b629411e5ff7e50cbb5cb4b3"}},
@@ -169,17 +130,7 @@
                  "75c4e76468cb2bd03067a9c349989ee914a1b581"}},
        {yokozuna,".*",
                  {git,"git://github.com/basho/yokozuna.git",
-<<<<<<< HEAD
-                      "7268ef24ddd85c34b779bae297dd147157a5197d"}},
-       {riak_json,".*",
-                  {git,"git://github.com/basho-labs/riak_json.git",
-                       "7c3a215e0f7277ba6b65c98a8efc836a00b9ae03"}},
-       {riak_json_http,".*",
-                       {git,"git://github.com/basho-labs/riak_json_http.git",
-                            "270c39c6dde8db0f045901a84fce374079297e37"}},
-=======
                       "4740d71290e664e17c654f2fe0cafe5a8252033b"}},
->>>>>>> 1aa12b1de8618c2e6de936c86d87c49d297f5298
        {jsx,".*",
             {git,"git://github.com/talentdeficit/jsx.git",
                  "d011411c23e9f8c29d98aa1b7a50ddf9709b6a60"}},

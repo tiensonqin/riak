@@ -13,7 +13,7 @@
 
 %% @doc The severity level of the console log, default is 'info'.
 {mapping, "log.console.level", "lager.handlers", [
-  {default, info},
+  {default, debug},
   {datatype, {enum, [debug, info, warning, error]}}
 ]}.
 
