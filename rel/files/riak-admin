@@ -26,10 +26,96 @@ usage() {
     echo "                    reip | js-reload | erl-reload | wait-for-service | "
     echo "                    ringready | transfers | force-remove | down |"
     echo "                    cluster-info | member-status | ring-status | vnode-status |"
-    echo "                    aae-status | diag | status | transfer-limit | reformat-indexes |"
+    echo "                    aae | diag | status | transfer-limit | reformat-indexes |"
     echo "                    top [-interval N] [-sort reductions|memory|msg_q] [-lines N] |"
     echo "                    downgrade-objects | security | bucket-type | repair-2i |"
     echo "                    search | services | ensemble-status }"
+}
+
+aae_admin()
+{
+    case "$1" in
+        status)
+            if [ $# -ne 1 ]; then
+                echo "Usage: $SCRIPT $1"
+                exit 1
+            fi
+            shift
+
+            node_up_check
+            $NODETOOL rpc riak_kv_entropy_console handle_aae_status $@
+            ;;
+        enabled)
+            if [ $# -gt 3 ]; then
+                echo "Usage: $SCRIPT $1"
+                echo "       $SCRIPT $1 (true | false)"
+                echo "       $SCRIPT $1 <node>"
+                echo "       $SCRIPT $1 <node> (true | false)"
+                exit 1
+            fi
+            shift
+            node_up_check
+            $NODETOOL rpc riak_kv_entropy_console handle_aae_enabled $@
+            ;;
+        debug)
+            if [ $# -gt 3 ]; then
+                echo "Usage: $SCRIPT $1"
+                echo "       $SCRIPT $1 (true | false)"
+                echo "       $SCRIPT $1 <node>"
+                echo "       $SCRIPT $1 <node> (true | false)"
+                exit 1
+            fi
+            shift
+            node_up_check
+            $NODETOOL rpc riak_kv_entropy_console handle_aae_debug_enabled $@
+            ;;
+       cancel[_-]exchanges)
+            if [ $# -gt 2 ]; then
+                echo "Usage: $SCRIPT $1"
+                exit 1
+            fi
+            shift
+
+            node_up_check
+            $NODETOOL rpc riak_kv_entropy_console handle_cancel_aae_exchanges $@
+            ;;
+        reset)
+            if [ $# -gt 2 ]; then
+                echo "Usage: $SCRIPT $1 "
+                echo "       $SCRIPT $1 <node>"
+                exit 1
+            fi
+            shift
+            node_up_check
+            $NODETOOL rpc riak_kv_entropy_console handle_aae_reset $@
+            ;;
+        *)
+            echo "\
+Usage: $SCRIPT aae <command>
+
+The following commands allow for management of the active anti-entropy (AAE) 
+subsystem,  They can be used to inspect the current status, enable, or disable 
+AAE on a node or across the cluster:
+
+   enabled [<node>] [(true | false)]    
+       Display whether or not AAE is running on <node>.  Setting true or false 
+       will enable or disable AAE. Ommitting <node> will cause the command to
+       work over the entire cluster.
+
+   status                         
+       Display current AAE system status
+
+   debug [<node>] [(true | false)]    
+       Enables or Disables AAE debug mode on <node> or entire cluster.
+
+   cancel-exchanges [<node>]
+       Cancels AAE tree exchanges on <node> or entire cluster
+
+   reset [<node>]                   
+       Stops AAE, deletes anti_entropy information and starts AAE on <node>
+       or entire cluster
+"
+    esac
 }
 
 cluster_admin()
@@ -867,6 +953,10 @@ case "$1" in
     search)
         shift
         search_admin "$@"
+        ;;
+    aae)
+        shift
+        aae_admin "$@"
         ;;
     *)
         usage
