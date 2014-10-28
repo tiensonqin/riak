@@ -3,27 +3,23 @@
 * Hacked riak
   hack涉及到的riak组件有riak_kv, riak_api和riak_pb.
 
-  #+BEGIN_VERSE
-  1. riak_kv
-  添加 riak_kv_pb_scan.erl,
-  riak_kv_scan_fsm.erl,
-  riak_kv_scan_core.erl,
-  riak_kv_scan_fsm_sup.erl,
+  - riak_kv
+    添加 riak_kv_pb_scan.erl,
+    riak_kv_scan_fsm.erl,
+    riak_kv_scan_core.erl,
+    riak_kv_scan_fsm_sup.erl,
+    修改 riak_client.erl,
+    riak_kv_eleveldb_backend.erl,
+    riak_kv_sup.erl,
+    riak_kv_vnode.hrl,
+    riak_kv_vnode.erl
 
-  修改 riak_client.erl,
-  riak_kv_eleveldb_backend.erl,
-  riak_kv_sup.erl,
-  riak_kv_vnode.hrl,
-  riak_kv_vnode.erl
+  - riak_api
+    修改rebar.config, 替换riak_pb依赖为2.0.0_hack分支
 
-  2. riak_api
-  修改rebar.config, 替换riak_pb依赖为2.0.0_hack分支
-
-  3. riak_pb
-  修改riak_kv.proto,
-  riak_pb_messages.csv
-  #+END_VERSE
-
+  - riak_pb
+    修改riak_kv.proto,
+    riak_pb_messages.csv
 
 ** Build
    #+BEGIN_SRC sh
